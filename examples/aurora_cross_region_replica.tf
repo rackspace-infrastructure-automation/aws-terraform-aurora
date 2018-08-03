@@ -5,7 +5,7 @@ data "aws_kms_alias" "rds_crr" {
 
 module "aurora_replica" {
   # This needs to be updated once a permanent home is found
-  source = "C:\\cftemplates\\1011039-aws-Rackspace-FAWS-Support-Engineering\\modules\\aurora"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v1.0.0"
 
   providers = {
     aws = "aws.oregon"

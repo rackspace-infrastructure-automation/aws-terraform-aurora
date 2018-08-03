@@ -236,6 +236,12 @@ variable "environment" {
   default     = "Development"
 }
 
+variable "skip_final_snapshot" {
+  description = "Boolean value to control if the DB Cluster will take a final snapshot when destroyed.  This value should be set to false if a final snapshot is desired."
+  type        = "string"
+  default     = false
+}
+
 variable "source_cluster" {
   description = "The cluster ID of the master Aurora cluster that will replicate to the created cluster. The master must be in a different region. Leave this parameter blank to create a master Aurora cluster."
   default     = ""
