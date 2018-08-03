@@ -218,7 +218,7 @@ resource "aws_rds_cluster" "db_cluster" {
   backup_retention_period      = "${var.backup_retention_period}"
   preferred_backup_window      = "${var.backup_window}"
   preferred_maintenance_window = "${var.maintenance_window}"
-  skip_final_snapshot          = "${local.read_replica}"
+  skip_final_snapshot          = "${local.read_replica || var.skip_final_snapshot}"
   final_snapshot_identifier    = "${var.name}-final-snapshot"
 
   tags = "${merge(var.tags, local.tags)}"
