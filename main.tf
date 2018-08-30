@@ -1,3 +1,30 @@
+/**
+ * # aws-terraform-aurora
+ *
+ *This module creates an aurora RDS cluster.  The module currently supports the aurora, aurora-mysql, and aurora-postgres engines.
+ *
+ * The module will output the required configuration files to enable client and worker node setup and configuration.
+ *
+ *## Basic Usage
+ *
+ *```
+ *module "aurora_master" {
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.1"
+ *
+ *  subnets           = "${module.vpc.private_subnets}"
+ *  security_groups   =  ["${module.vpc.default_sg}"]
+ *  name              = "sample-aurora-master"
+ *  engine            = "aurora"
+ *  instance_class    = "db.t2.medium"
+ *  storage_encrypted = true
+ *  binlog_format     = "MIXED"
+ *  password          = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ *}
+ *```
+ *
+ * Full working references are available at [examples](examples)
+ */
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -80,8 +107,21 @@ locals {
     },
   ]
 
-  rs_alarm_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-urgent"
-  rs_alarm       = "${var.rackspace_alarms_enabled ? local.rs_alarm_topic : "" }"
+  rs_alarm       = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-urgent"
+  rs_alarm_topic = ["${var.rackspace_alarms_enabled ? local.rs_alarm : "" }"]
+
+  alarm_sns_notification = "${compact(list(var.notification_topic))}"
+  rs_alarm_option        = "${var.rackspace_managed ? "managed" : "unmanaged"}"
+
+  rs_alarm_action = {
+    managed   = "${local.rs_alarm_topic}"
+    unmanaged = "${local.alarm_sns_notification}"
+  }
+
+  rs_ok_action = {
+    managed   = "${local.rs_alarm_topic}"
+    unmanaged = []
+  }
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -271,8 +311,8 @@ resource "aws_cloudwatch_metric_alarm" "instance_alarms" {
   statistic           = "Average"
   threshold           = "${var.alarm_cpu_limit}"
   alarm_description   = "CPU Utilization above ${var.alarm_cpu_limit} for 15 minutes.  Sending notifications..."
-  alarm_actions       = ["${compact(list(var.notification_topic, local.rs_alarm))}"]
-  ok_actions          = ["${compact(list(local.rs_alarm))}"]
+  alarm_actions       = ["${local.rs_alarm_action[local.rs_alarm_option]}"]
+  ok_actions          = ["${local.rs_ok_action[local.rs_alarm_option]}"]
 
   dimensions {
     DBInstanceIdentifier = "${element(aws_rds_cluster_instance.cluster_instance.*.id, count.index)}"
