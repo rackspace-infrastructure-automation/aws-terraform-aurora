@@ -250,11 +250,13 @@ variable "skip_final_snapshot" {
 
 variable "source_cluster" {
   description = "The cluster ID of the master Aurora cluster that will replicate to the created cluster. The master must be in a different region. Leave this parameter blank to create a master Aurora cluster."
+  type        = "string"
   default     = ""
 }
 
 variable "source_region" {
   description = "The region of the master Aurora cluster that will replicate to the created cluster. The master must be in a different region. Leave this parameter blank to create a master Aurora cluster."
+  type        = "string"
   default     = ""
 }
 

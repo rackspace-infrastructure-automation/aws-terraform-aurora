@@ -12,7 +12,7 @@ resource "random_string" "password" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
 
   vpc_name = "Aurora-Test1VPC"
 }
