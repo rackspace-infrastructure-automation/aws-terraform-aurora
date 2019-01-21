@@ -200,9 +200,9 @@ variable "monitoring_interval" {
 }
 
 variable "notification_topic" {
-  description = "SNS Topic ARN to use for customer notifications from CloudWatch alarms. (OPTIONAL)"
-  type        = "string"
-  default     = ""
+  description = "List of SNS Topic ARNs to use for customer notifications from CloudWatch alarms. (OPTIONAL)"
+  type        = "list"
+  default     = []
 }
 
 variable "rackspace_alarms_enabled" {
