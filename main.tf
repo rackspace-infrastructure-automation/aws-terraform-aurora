@@ -9,7 +9,7 @@
  *
  *```
  *module "aurora_master" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.1"
+ *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
  *
  *  subnets           = "${module.vpc.private_subnets}"
  *  security_groups   =  ["${module.vpc.default_sg}"]
@@ -84,44 +84,6 @@ locals {
 
   major_version = "${join(".", local.version_chunk[0])}"
   family        = "${coalesce(var.family, join("", list(var.engine, local.major_version)))}"
-
-  notification_set    = "${ var.notification_topic == "" ? 0 : 1 }"
-  cluster_alarm_count = 2
-
-  cluster_alarms = [
-    {
-      alarm_name         = "write-io-high"
-      evaluation_periods = 6
-      description        = "Write IO > ${var.alarm_write_io_limit}, sending notifcation..."
-      operator           = "GreaterThanThreshold"
-      threshold          = "${var.alarm_write_io_limit}"
-      metric             = "VolumeWriteIOPs"
-    },
-    {
-      alarm_name         = "read-io-high"
-      evaluation_periods = 6
-      description        = "Read IO > ${var.alarm_read_io_limit}, sending notifcation..."
-      operator           = "GreaterThanThreshold"
-      threshold          = "${var.alarm_read_io_limit}"
-      metric             = "VolumeReadIOPs"
-    },
-  ]
-
-  rs_alarm       = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-urgent"
-  rs_alarm_topic = ["${var.rackspace_alarms_enabled ? local.rs_alarm : "" }"]
-
-  alarm_sns_notification = "${compact(list(var.notification_topic))}"
-  rs_alarm_option        = "${var.rackspace_managed ? "managed" : "unmanaged"}"
-
-  rs_alarm_action = {
-    managed   = "${local.rs_alarm_topic}"
-    unmanaged = "${local.alarm_sns_notification}"
-  }
-
-  rs_ok_action = {
-    managed   = "${local.rs_alarm_topic}"
-    unmanaged = []
-  }
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -299,42 +261,75 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
   depends_on = ["aws_iam_role_policy_attachment.enhanced_monitoring_policy"]
 }
 
-resource "aws_cloudwatch_metric_alarm" "instance_alarms" {
-  count = "${(var.replica_instances + 1)  * (var.rackspace_alarms_enabled || local.notification_set ? 1 : 0)}"
+data "null_data_source" "alarm_dimensions" {
+  count = "${var.replica_instances + 1}"
 
-  alarm_name          = "${var.name}-${format("%02d",count.index+1)}-high-cpu"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "15"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/RDS"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "${var.alarm_cpu_limit}"
-  alarm_description   = "CPU Utilization above ${var.alarm_cpu_limit} for 15 minutes.  Sending notifications..."
-  alarm_actions       = ["${local.rs_alarm_action[local.rs_alarm_option]}"]
-  ok_actions          = ["${local.rs_ok_action[local.rs_alarm_option]}"]
-
-  dimensions {
+  inputs = {
     DBInstanceIdentifier = "${element(aws_rds_cluster_instance.cluster_instance.*.id, count.index)}"
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "cluster_alarms" {
-  count = "${local.cluster_alarm_count * (local.notification_set ? 1 : 0)}"
+module "high_cpu" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  alarm_name          = "${var.name}-${lookup(local.cluster_alarms[count.index], "alarm_name")}"
-  comparison_operator = "${lookup(local.cluster_alarms[count.index], "operator")}"
-  evaluation_periods  = "${lookup(local.cluster_alarms[count.index], "evaluation_periods")}"
-  metric_name         = "${lookup(local.cluster_alarms[count.index], "metric")}"
-  namespace           = "AWS/RDS"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "${lookup(local.cluster_alarms[count.index], "threshold")}"
-  alarm_description   = "${lookup(local.cluster_alarms[count.index], "description")}"
-  alarm_actions       = ["${compact(list(var.notification_topic))}"]
+  alarm_count              = "${var.replica_instances + 1}"
+  alarm_description        = "CPU Utilization above ${var.alarm_cpu_limit} for 15 minutes.  Sending notifications..."
+  alarm_name               = "${var.name}-high-cpu"
+  comparison_operator      = "GreaterThanThreshold"
+  customer_alarms_enabled  = true
+  dimensions               = "${data.null_data_source.alarm_dimensions.*.outputs}"
+  evaluation_periods       = 15
+  metric_name              = "CPUUtilization"
+  namespace                = "AWS/RDS"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "urgent"
+  statistic                = "Average"
+  threshold                = "${var.alarm_cpu_limit}"
+}
 
-  dimensions {
+module "write_io_high" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+
+  alarm_description        = "Write IO > ${var.alarm_write_io_limit}, sending notification..."
+  alarm_name               = "${var.name}-write-io-high"
+  comparison_operator      = "GreaterThanThreshold"
+  customer_alarms_enabled  = true
+  evaluation_periods       = 6
+  metric_name              = "VolumeWriteIOPs"
+  namespace                = "AWS/RDS"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 300
+  rackspace_alarms_enabled = false
+  statistic                = "Average"
+  threshold                = "${var.alarm_write_io_limit}"
+
+  dimensions = [{
     EngineName          = "${var.engine}"
     DbClusterIdentifier = "${aws_rds_cluster.db_cluster.id}"
-  }
+  }]
+}
+
+module "read_io_high" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+
+  alarm_description        = "Read IO > ${var.alarm_read_io_limit}, sending notification..."
+  alarm_name               = "${var.name}-read-io-high"
+  comparison_operator      = "GreaterThanThreshold"
+  customer_alarms_enabled  = true
+  evaluation_periods       = 6
+  metric_name              = "VolumeReadIOPs"
+  namespace                = "AWS/RDS"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 300
+  rackspace_alarms_enabled = false
+  statistic                = "Average"
+  threshold                = "${var.alarm_read_io_limit}"
+
+  dimensions = [{
+    EngineName          = "${var.engine}"
+    DbClusterIdentifier = "${aws_rds_cluster.db_cluster.id}"
+  }]
 }

@@ -8,7 +8,7 @@ The module will output the required configuration files to enable client and wor
 
 ```
 module "aurora_master" {
- source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.1"
+ source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
 
  subnets           = "${module.vpc.private_subnets}"
  security_groups   =  ["${module.vpc.default_sg}"]
@@ -51,7 +51,7 @@ Full working references are available at [examples](examples)
 | maintenance\_window | The weekly time range (in UTC) during which system maintenance can occur. | string | `"Sun:07:00-Sun:08:00"` | no |
 | monitoring\_interval | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60. | string | `"0"` | no |
 | name | The name prefix to use for the resources created in this module. | string | n/a | yes |
-| notification\_topic | SNS Topic ARN to use for customer notifications from CloudWatch alarms. (OPTIONAL) | string | `""` | no |
+| notification\_topic | List of SNS Topic ARNs to use for customer notifications from CloudWatch alarms. (OPTIONAL) | list | `<list>` | no |
 | options | List of custom options to apply to the option group. | list | `<list>` | no |
 | parameters | List of custom parameters to apply to the parameter group. | list | `<list>` | no |
 | password | Password for the local administrator account. | string | n/a | yes |
