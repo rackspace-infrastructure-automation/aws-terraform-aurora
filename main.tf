@@ -219,6 +219,7 @@ resource "aws_rds_cluster" "db_cluster" {
 
   backup_retention_period      = "${var.backup_retention_period}"
   preferred_backup_window      = "${var.backup_window}"
+  backtrack_window             = "${var.engine == "aurora" ? var.backtrack_window: 0 }"
   preferred_maintenance_window = "${var.maintenance_window}"
   skip_final_snapshot          = "${local.read_replica || var.skip_final_snapshot}"
   final_snapshot_identifier    = "${var.name}-final-snapshot"
