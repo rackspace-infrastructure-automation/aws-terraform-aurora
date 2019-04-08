@@ -22,7 +22,7 @@ module "aurora_master" {
 
   subnets             = "${module.vpc.private_subnets}"
   security_groups     = ["${module.vpc.default_sg}"]
-  name                = "test-aurora-master"
+  name                = "test1-aurora-master"
   engine              = "aurora"
   instance_class      = "db.t2.medium"
   storage_encrypted   = true

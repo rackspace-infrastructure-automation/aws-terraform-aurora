@@ -34,6 +34,12 @@ variable "backup_window" {
   default     = "05:00-06:00"
 }
 
+variable "backtrack_window" {
+  description = "The target backtrack window, in seconds.  Defaults to 1 day. Setting only affects supported versions (currently MySQL 5.6)."
+  type        = "string"
+  default     = 86400
+}
+
 variable "db_snapshot_arn" {
   description = "The identifier for the DB cluster snapshot from which you want to restore."
   type        = "string"
