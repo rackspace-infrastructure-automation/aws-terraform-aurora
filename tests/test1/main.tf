@@ -3,6 +3,10 @@ provider "aws" {
   region  = "us-west-2"
 }
 
+provider "random" {
+  version = "~> 2.0"
+}
+
 resource "random_string" "password" {
   length      = 16
   special     = false
@@ -11,10 +15,17 @@ resource "random_string" "password" {
   min_numeric = 1
 }
 
+resource "random_string" "name_rstring" {
+  length  = 6
+  special = false
+  number  = false
+  upper   = false
+}
+
 module "vpc" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
 
-  vpc_name = "Aurora-Test1VPC"
+  vpc_name = "${random_string.name_rstring.result}-Aurora-Test1VPC"
 }
 
 module "aurora_master" {
@@ -22,7 +33,7 @@ module "aurora_master" {
 
   subnets             = "${module.vpc.private_subnets}"
   security_groups     = ["${module.vpc.default_sg}"]
-  name                = "test1-aurora-master"
+  name                = "${random_string.name_rstring.result}-test-aurora"
   engine              = "aurora"
   instance_class      = "db.t2.medium"
   storage_encrypted   = true
