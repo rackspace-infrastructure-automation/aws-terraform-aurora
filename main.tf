@@ -39,12 +39,12 @@ locals {
     }
 
     aurora-mysql = {
-      version = "5.7.mysql_aurora.2.04.1"
+      version = "5.7.12"
     }
 
     aurora-postgresql = {
       port    = "5432"
-      version = "10.7"
+      version = "9.6.8"
     }
   }
 
