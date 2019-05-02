@@ -63,7 +63,7 @@ variable "dbname" {
 }
 
 variable "engine" {
-  description = "Database Engine Type.  Allowed values: aurora-mysql, aurora-postgresql, aurora"
+  description = "Database Engine Type.  Allowed values: aurora-mysql, aurora, aurora-postgresql"
   type        = "string"
   default     = "aurora-mysql"
 }
@@ -72,6 +72,12 @@ variable "engine_version" {
   description = "Database Engine Minor Version http://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html"
   type        = "string"
   default     = ""
+}
+
+variable "engine_mode" {
+  description = "The database engine mode. Allowed values: provisioned and global(aurora engine only)."
+  type        = "string"
+  default     = "provisioned"
 }
 
 variable "instance_class" {
@@ -86,6 +92,12 @@ variable "name" {
 
 variable "port" {
   description = "The port on which the DB accepts connections"
+  type        = "string"
+  default     = ""
+}
+
+variable "global_cluster_identifier" {
+  description = "Global Cluster identifier. Property of aws_rds_global_cluster (Ignored if engine_mode is not 'global')."
   type        = "string"
   default     = ""
 }

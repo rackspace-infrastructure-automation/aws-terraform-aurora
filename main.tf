@@ -30,7 +30,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  is_postgres = "${var.engine == "aurora-postgres"}" # Allows setting postgres speciffic options
+  is_postgres = "${var.engine == "aurora-postgres"}" # Allows setting postgres specific options
 
   # This map allows setting engine defaults.  Should be updated as new engine versions are released
   engine_defaults = {
@@ -53,6 +53,9 @@ locals {
   port = "${coalesce(var.port, lookup(local.engine_defaults[var.engine], "port", "3306"))}"
 
   engine_version = "${coalesce(var.engine_version, lookup(local.engine_defaults[var.engine], "version"))}"
+
+  global_cluster_identifier = "${var.engine_mode == "global" ? var.global_cluster_identifier : ""}"
+  backtrack_support         = "${var.engine_mode == "aurora" && var.engine_mode == "provisioned" ? true : false}"
 
   tags {
     Name            = "${var.name}"
@@ -197,10 +200,12 @@ locals {
 
 resource "aws_rds_cluster" "db_cluster" {
   cluster_identifier_prefix = "${var.name}-"
+  global_cluster_identifier = "${local.global_cluster_identifier}"
 
   engine         = "${var.engine}"
   engine_version = "${local.engine_version}"
   port           = "${local.port}"
+  engine_mode    = "${var.engine_mode}"
 
   storage_encrypted = "${var.storage_encrypted}"
   kms_key_id        = "${var.kms_key_id}"
@@ -219,7 +224,7 @@ resource "aws_rds_cluster" "db_cluster" {
 
   backup_retention_period      = "${var.backup_retention_period}"
   preferred_backup_window      = "${var.backup_window}"
-  backtrack_window             = "${var.engine == "aurora" ? var.backtrack_window: 0 }"
+  backtrack_window             = "${local.backtrack_support ? var.backtrack_window: 0 }"
   preferred_maintenance_window = "${var.maintenance_window}"
   skip_final_snapshot          = "${local.read_replica || var.skip_final_snapshot}"
   final_snapshot_identifier    = "${var.name}-final-snapshot"

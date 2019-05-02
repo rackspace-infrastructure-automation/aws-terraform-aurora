@@ -38,7 +38,8 @@ Full working references are available at [examples](examples)
 | cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | list | `<list>` | no |
 | db\_snapshot\_arn | The identifier for the DB cluster snapshot from which you want to restore. | string | `""` | no |
 | dbname | The DB name to create. If omitted, no database is created initially | string | `""` | no |
-| engine | Database Engine Type.  Allowed values: aurora-mysql, aurora-postgresql, aurora | string | `"aurora-mysql"` | no |
+| engine | Database Engine Type.  Allowed values: aurora-mysql, aurora, aurora-postgresql | string | `"aurora-mysql"` | no |
+| engine\_mode | The database engine mode. Allowed values: provisioned and global(aurora engine only). | string | `"provisioned"` | no |
 | engine\_version | Database Engine Minor Version http://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html | string | `""` | no |
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | string | `"Development"` | no |
 | existing\_cluster\_parameter\_group\_name | The existing cluster parameter group to use for this instance. (OPTIONAL) | string | `""` | no |
@@ -47,6 +48,7 @@ Full working references are available at [examples](examples)
 | existing\_parameter\_group\_name | The existing parameter group to use for this instance. (OPTIONAL) | string | `""` | no |
 | existing\_subnet\_group | The existing DB subnet group to use for this cluster (OPTIONAL) | string | `""` | no |
 | family | Parameter Group Family Name (ex. aurora5.6, aurora-postgresql9.6, aurora-mysql5.7) | string | `""` | no |
+| global\_cluster\_identifier | Global Cluster identifier. Property of aws_rds_global_cluster (Ignored if engine_mode is not 'global'). | string | `""` | no |
 | instance\_class | The database instance type. | string | n/a | yes |
 | kms\_key\_id | KMS Key Arn to use for storage encryption. (OPTIONAL) | string | `""` | no |
 | maintenance\_window | The weekly time range (in UTC) during which system maintenance can occur. | string | `"Sun:07:00-Sun:08:00"` | no |
