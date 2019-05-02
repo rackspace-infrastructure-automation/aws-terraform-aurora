@@ -10,14 +10,17 @@ The module will output the required configuration files to enable client and wor
 module "aurora_master" {
  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
 
- subnets           = "${module.vpc.private_subnets}"
- security_groups   =  ["${module.vpc.default_sg}"]
- name              = "sample-aurora-master"
- engine            = "aurora"
- instance_class    = "db.t2.medium"
- storage_encrypted = true
- binlog_format     = "MIXED"
- password          = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ subnets                                  = "${module.vpc.private_subnets}"
+ security_groups                          = ["${module.vpc.default_sg}"]
+ name                                     = "sample-aurora-master"
+ engine                                   = "aurora"
+ instance_class                           = "db.t2.medium"
+ storage_encrypted                        = true
+ binlog_format                            = "MIXED"
+ password                                 = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ replica_instances                        = 2
+ instance_availability_zone_list_provided = true
+ instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
 }
 ```
 
@@ -49,6 +52,8 @@ Full working references are available at [examples](examples)
 | existing\_subnet\_group | The existing DB subnet group to use for this cluster (OPTIONAL) | string | `""` | no |
 | family | Parameter Group Family Name (ex. aurora5.6, aurora-postgresql9.6, aurora-mysql5.7) | string | `""` | no |
 | global\_cluster\_identifier | Global Cluster identifier. Property of aws_rds_global_cluster (Ignored if engine_mode is not 'global'). | string | `""` | no |
+| instance\_availability\_zone\_list | List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance,  second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Variable instance_availability_zone_list_provided must be set to be able to  provide list of AZs. Also please remember that the number of AZs specified here should equal to replica_instances + 1. | list | `<list>` | no |
+| instance\_availability\_zone\_list\_provided | instance_availability_zone_list has been provided with a list of AZs per instance. | string | `"false"` | no |
 | instance\_class | The database instance type. | string | n/a | yes |
 | kms\_key\_id | KMS Key Arn to use for storage encryption. (OPTIONAL) | string | `""` | no |
 | maintenance\_window | The weekly time range (in UTC) during which system maintenance can occur. | string | `"Sun:07:00-Sun:08:00"` | no |
