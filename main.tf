@@ -20,7 +20,6 @@
  *  binlog_format                            = "MIXED"
  *  password                                 = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
  *  replica_instances                        = 2
- *  instance_availability_zone_list_provided = true
  *  instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
  *}
  *```
@@ -260,7 +259,7 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
 
   db_subnet_group_name    = "${local.subnet_group}"
   db_parameter_group_name = "${local.parameter_group}"
-  availability_zone       = "${var.instance_availability_zone_list_provided ? element(coalescelist(var.instance_availability_zone_list, list("")), count.index) : ""}"
+  availability_zone       = "${element(var.instance_availability_zone_list, count.index)}"
 
   monitoring_interval = "${var.monitoring_interval}"
   monitoring_role_arn = "${local.monitoring_role_arn}"
