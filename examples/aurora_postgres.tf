@@ -58,6 +58,8 @@ module "aurora_postgresql_master" {
   # dbname         = "mydb"
   # engine_version = "9.6.8"
   # port           = "5432"
+  # replica_instances                        = 2
+  # instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
 
   ##################
   # RDS Advanced

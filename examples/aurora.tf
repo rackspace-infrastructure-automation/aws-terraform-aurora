@@ -69,6 +69,8 @@ module "aurora_master" {
   # dbname         = "mydb"
   # engine_version = "5.6.10a"
   # port           = "3306"
+  # replica_instances                        = 2
+  # instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
 
   ##################
   # RDS Advanced

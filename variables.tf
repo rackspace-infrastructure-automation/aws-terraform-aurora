@@ -56,6 +56,16 @@ variable "maintenance_window" {
 # Basic RDS
 ###########
 
+variable "instance_availability_zone_list" {
+  description = <<HEREDOC
+List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance, 
+second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Also please remember that the number of AZs specified here should equal to replica_instances + 1.
+HEREDOC
+
+  type    = "list"
+  default = [""]
+}
+
 variable "dbname" {
   description = "The DB name to create. If omitted, no database is created initially"
   type        = "string"

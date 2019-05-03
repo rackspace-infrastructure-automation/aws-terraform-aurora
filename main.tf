@@ -11,14 +11,16 @@
  *module "aurora_master" {
  *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
  *
- *  subnets           = "${module.vpc.private_subnets}"
- *  security_groups   =  ["${module.vpc.default_sg}"]
- *  name              = "sample-aurora-master"
- *  engine            = "aurora"
- *  instance_class    = "db.t2.medium"
- *  storage_encrypted = true
- *  binlog_format     = "MIXED"
- *  password          = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ *  subnets                                  = "${module.vpc.private_subnets}"
+ *  security_groups                          = ["${module.vpc.default_sg}"]
+ *  name                                     = "sample-aurora-master"
+ *  engine                                   = "aurora"
+ *  instance_class                           = "db.t2.medium"
+ *  storage_encrypted                        = true
+ *  binlog_format                            = "MIXED"
+ *  password                                 = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ *  replica_instances                        = 2
+ *  instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
  *}
  *```
  *
@@ -228,8 +230,7 @@ resource "aws_rds_cluster" "db_cluster" {
   preferred_maintenance_window = "${var.maintenance_window}"
   skip_final_snapshot          = "${local.read_replica || var.skip_final_snapshot}"
   final_snapshot_identifier    = "${var.name}-final-snapshot"
-
-  tags = "${merge(var.tags, local.tags)}"
+  tags                         = "${merge(var.tags, local.tags)}"
 
   # Option Group, Parameter Group, and Subnet Group and cluster parameter group added as the coalesce
   # to use any existing groups seems to throw off dependancies while destroying resources.
@@ -258,6 +259,7 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
 
   db_subnet_group_name    = "${local.subnet_group}"
   db_parameter_group_name = "${local.parameter_group}"
+  availability_zone       = "${element(var.instance_availability_zone_list, count.index)}"
 
   monitoring_interval = "${var.monitoring_interval}"
   monitoring_role_arn = "${local.monitoring_role_arn}"
