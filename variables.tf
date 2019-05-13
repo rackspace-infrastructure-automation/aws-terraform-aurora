@@ -134,10 +134,22 @@ variable "cluster_parameters" {
   default     = []
 }
 
+variable "create_internal_records" {
+  description = "Create an internal Route 53 record for the RDS cluster and cluster reader. Default is false."
+  type        = "string"
+  default     = "false"
+}
+
 variable "family" {
   description = "Parameter Group Family Name (ex. aurora5.6, aurora-postgresql9.6, aurora-mysql5.7)"
   type        = "string"
   default     = ""
+}
+
+variable "enable_delete_protection" {
+  description = "If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false"
+  type        = "string"
+  default     = "false"
 }
 
 variable "existing_cluster_parameter_group_name" {
@@ -154,6 +166,24 @@ variable "existing_option_group_name" {
 
 variable "existing_parameter_group_name" {
   description = "The existing parameter group to use for this instance. (OPTIONAL)"
+  type        = "string"
+  default     = ""
+}
+
+variable "internal_record_cluster" {
+  description = "The full record name you would like to add as a CNAME for the cluster that matches your Hosted Zone. i.e. cluster.example.com"
+  type        = "string"
+  default     = ""
+}
+
+variable "internal_record_cluster_reader" {
+  description = "The full record name you would like to add as a CNAME for the cluster reader. i.e. reader.example.com"
+  type        = "string"
+  default     = ""
+}
+
+variable "internal_zone_id" {
+  description = "The zone id you would like the internal records for the cluster and reader to be created in. i.e. Z2QHD5YD1WXE9M"
   type        = "string"
   default     = ""
 }
