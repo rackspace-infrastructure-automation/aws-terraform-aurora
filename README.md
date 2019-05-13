@@ -38,8 +38,10 @@ Full working references are available at [examples](examples)
 | backup\_window | The daily time range during which automated backups are created if automated backups are enabled. | string | `"05:00-06:00"` | no |
 | binlog\_format | Sets the desired format. Defaults to OFF. Should be set to MIXED if this Aurora cluster will replicate to another RDS Instance or cluster. Ignored for aurora-postgresql engine | string | `"OFF"` | no |
 | cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | list | `<list>` | no |
+| create\_internal\_records | Create an internal Route 53 record for the RDS cluster and cluster reader. Default is false. | string | `"false"` | no |
 | db\_snapshot\_arn | The identifier for the DB cluster snapshot from which you want to restore. | string | `""` | no |
 | dbname | The DB name to create. If omitted, no database is created initially | string | `""` | no |
+| enable\_delete\_protection | If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false | string | `"false"` | no |
 | engine | Database Engine Type.  Allowed values: aurora-mysql, aurora, aurora-postgresql | string | `"aurora-mysql"` | no |
 | engine\_mode | The database engine mode. Allowed values: provisioned and global(aurora engine only). | string | `"provisioned"` | no |
 | engine\_version | Database Engine Minor Version http://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html | string | `""` | no |
@@ -53,6 +55,9 @@ Full working references are available at [examples](examples)
 | global\_cluster\_identifier | Global Cluster identifier. Property of aws_rds_global_cluster (Ignored if engine_mode is not 'global'). | string | `""` | no |
 | instance\_availability\_zone\_list | List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance,  second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Also please remember that the number of AZs specified here should equal to replica_instances + 1. | list | `<list>` | no |
 | instance\_class | The database instance type. | string | n/a | yes |
+| internal\_record\_cluster | The full record name you would like to add as a CNAME for the cluster that matches your Hosted Zone. i.e. cluster.example.com | string | `""` | no |
+| internal\_record\_cluster\_reader | The full record name you would like to add as a CNAME for the cluster reader. i.e. reader.example.com | string | `""` | no |
+| internal\_zone\_id | The zone id you would like the internal records for the cluster and reader to be created in. i.e. Z2QHD5YD1WXE9M | string | `""` | no |
 | kms\_key\_id | KMS Key Arn to use for storage encryption. (OPTIONAL) | string | `""` | no |
 | maintenance\_window | The weekly time range (in UTC) during which system maintenance can occur. | string | `"Sun:07:00-Sun:08:00"` | no |
 | monitoring\_interval | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60. | string | `"0"` | no |

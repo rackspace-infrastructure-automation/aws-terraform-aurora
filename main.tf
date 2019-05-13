@@ -220,6 +220,8 @@ resource "aws_rds_cluster" "db_cluster" {
   source_region                 = "${local.read_replica ? var.source_region : "" }"
   snapshot_identifier           = "${var.db_snapshot_arn}"
 
+  deletion_protection = "${var.enable_delete_protection}"
+
   vpc_security_group_ids          = ["${var.security_groups}"]
   db_subnet_group_name            = "${local.subnet_group}"
   db_cluster_parameter_group_name = "${local.cluster_parameter_group}"
@@ -275,6 +277,24 @@ data "null_data_source" "alarm_dimensions" {
   inputs = {
     DBInstanceIdentifier = "${element(aws_rds_cluster_instance.cluster_instance.*.id, count.index)}"
   }
+}
+
+resource "aws_route53_record" "cluster_record" {
+  count   = "${var.create_internal_records ? 1:0}"
+  zone_id = "${var.internal_zone_id}"
+  name    = "${var.internal_record_cluster}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${aws_rds_cluster.db_cluster.endpoint}"]
+}
+
+resource "aws_route53_record" "cluster_reader_record" {
+  count   = "${var.create_internal_records ? 1:0}"
+  zone_id = "${var.internal_zone_id}"
+  name    = "${var.internal_record_cluster_reader}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${aws_rds_cluster.db_cluster.reader_endpoint}"]
 }
 
 module "high_cpu" {
