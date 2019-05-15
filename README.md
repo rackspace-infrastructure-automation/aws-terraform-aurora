@@ -6,20 +6,26 @@ The module will output the required configuration files to enable client and wor
 
 ## Basic Usage
 
-```
+```HCL
 module "aurora_master" {
- source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
 
- subnets                                  = "${module.vpc.private_subnets}"
- security_groups                          = ["${module.vpc.default_sg}"]
- name                                     = "sample-aurora-master"
- engine                                   = "aurora"
- instance_class                           = "db.t2.medium"
- storage_encrypted                        = true
- binlog_format                            = "MIXED"
- password                                 = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
- replica_instances                        = 2
- instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
+  binlog_format = "MIXED"
+  engine        = "aurora"
+
+  instance_availability_zone_list = [
+    "us-west-2a",
+    "us-west-2b",
+    "us-west-2c",
+  ]
+
+  instance_class    = "db.t2.medium"
+  name              = "sample-aurora-master"
+  password          = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+  replica_instances = 2
+  security_groups   = ["${module.vpc.default_sg}"]
+  storage_encrypted = true
+  subnets           = "${module.vpc.private_subnets}"
 }
 ```
 
@@ -37,6 +43,7 @@ Full working references are available at [examples](examples)
 | backup\_retention\_period | The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups. Compass best practice is 30 or more days. | string | `"35"` | no |
 | backup\_window | The daily time range during which automated backups are created if automated backups are enabled. | string | `"05:00-06:00"` | no |
 | binlog\_format | Sets the desired format. Defaults to OFF. Should be set to MIXED if this Aurora cluster will replicate to another RDS Instance or cluster. Ignored for aurora-postgresql engine | string | `"OFF"` | no |
+| cloudwatch\_logs\_exports | List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`. | list | `<list>` | no |
 | cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | list | `<list>` | no |
 | create\_internal\_records | Create an internal Route 53 record for the RDS cluster and cluster reader. Default is false. | string | `"false"` | no |
 | db\_snapshot\_arn | The identifier for the DB cluster snapshot from which you want to restore. | string | `""` | no |
@@ -53,7 +60,7 @@ Full working references are available at [examples](examples)
 | existing\_subnet\_group | The existing DB subnet group to use for this cluster (OPTIONAL) | string | `""` | no |
 | family | Parameter Group Family Name (ex. aurora5.6, aurora-postgresql9.6, aurora-mysql5.7) | string | `""` | no |
 | global\_cluster\_identifier | Global Cluster identifier. Property of aws_rds_global_cluster (Ignored if engine_mode is not 'global'). | string | `""` | no |
-| instance\_availability\_zone\_list | List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance,  second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Also please remember that the number of AZs specified here should equal to replica_instances + 1. | list | `<list>` | no |
+| instance\_availability\_zone\_list | List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance, second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Also please remember that the number of AZs specified here should equal to replica_instances + 1. | list | `<list>` | no |
 | instance\_class | The database instance type. | string | n/a | yes |
 | internal\_record\_cluster | The full record name you would like to add as a CNAME for the cluster that matches your Hosted Zone. i.e. cluster.example.com | string | `""` | no |
 | internal\_record\_cluster\_reader | The full record name you would like to add as a CNAME for the cluster reader. i.e. reader.example.com | string | `""` | no |
@@ -66,6 +73,8 @@ Full working references are available at [examples](examples)
 | options | List of custom options to apply to the option group. | list | `<list>` | no |
 | parameters | List of custom parameters to apply to the parameter group. | list | `<list>` | no |
 | password | Password for the local administrator account. | string | n/a | yes |
+| performance\_insights\_enable | Specifies whether Performance Insights is enabled or not. | string | `"false"` | no |
+| performance\_insights\_kms\_key\_id | (Optional) The ARN for the KMS key to encrypt Performance Insights data. When specifying performance_insights_kms_key_id, performance_insights_enabled needs to be set to true. | string | `""` | no |
 | port | The port on which the DB accepts connections | string | `""` | no |
 | publicly\_accessible | Boolean value that indicates whether the database instances are Internet-facing. | string | `"false"` | no |
 | rackspace\_alarms\_enabled | Specifies whether non-emergency rackspace alarms will create a ticket. | string | `"false"` | no |

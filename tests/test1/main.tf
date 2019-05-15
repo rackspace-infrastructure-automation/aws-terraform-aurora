@@ -31,30 +31,36 @@ module "vpc" {
 module "aurora_master" {
   source = "../../module"
 
-  subnets             = "${module.vpc.private_subnets}"
-  security_groups     = ["${module.vpc.default_sg}"]
-  name                = "${random_string.name_rstring.result}-test-aurora-1"
+  binlog_format       = "MIXED"
   engine              = "aurora"
   instance_class      = "db.t2.medium"
-  storage_encrypted   = true
-  binlog_format       = "MIXED"
+  name                = "${random_string.name_rstring.result}-test-aurora-1"
   password            = "${random_string.password.result}"
-  skip_final_snapshot = true
   replica_instances   = 2
+  security_groups     = ["${module.vpc.default_sg}"]
+  skip_final_snapshot = true
+  storage_encrypted   = true
+  subnets             = "${module.vpc.private_subnets}"
 }
 
 module "aurora_master_with_replicas" {
   source = "../../module"
 
-  subnets                         = "${module.vpc.private_subnets}"
-  security_groups                 = ["${module.vpc.default_sg}"]
-  name                            = "${random_string.name_rstring.result}-test-aurora-2"
-  engine                          = "aurora"
-  instance_class                  = "db.t2.medium"
-  storage_encrypted               = true
-  binlog_format                   = "MIXED"
-  password                        = "${random_string.password.result}"
-  skip_final_snapshot             = true
-  replica_instances               = 2
-  instance_availability_zone_list = ["us-west-2a", "us-west-2b", "us-west-2a"]
+  binlog_format = "MIXED"
+  engine        = "aurora"
+
+  instance_availability_zone_list = [
+    "us-west-2a",
+    "us-west-2b",
+    "us-west-2a",
+  ]
+
+  instance_class      = "db.t2.medium"
+  name                = "${random_string.name_rstring.result}-test-aurora-2"
+  password            = "${random_string.password.result}"
+  replica_instances   = 2
+  security_groups     = ["${module.vpc.default_sg}"]
+  skip_final_snapshot = true
+  storage_encrypted   = true
+  subnets             = "${module.vpc.private_subnets}"
 }

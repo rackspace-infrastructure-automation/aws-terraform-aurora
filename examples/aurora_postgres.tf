@@ -83,13 +83,16 @@ module "aurora_postgresql_master" {
   # RDS Monitoring
   ##################
 
-  # notification_topic           = "arn:aws:sns:<region>:<account>:some-topic"
-  # alarm_write_iops_limit       = 100000
-  # alarm_read_iops_limit        = 100000
-  # alarm_cpu_limit              = 60
-  # rackspace_alarms_enabled     = false
-  # monitoring_interval          = 0
-  # existing_monitoring_role_arn = ""
+  # notification_topic              = "arn:aws:sns:<region>:<account>:some-topic"
+  # alarm_write_iops_limit          = 100000
+  # alarm_read_iops_limit           = 100000
+  # alarm_cpu_limit                 = 60
+  # rackspace_alarms_enabled        = false
+  # monitoring_interval             = 0
+  # existing_monitoring_role_arn    = ""
+  # cloudwatch_logs_exports         = []
+  # performance_insights_enable     = false
+  # performance_insights_kms_key_id = ""
 
   ##################
   # Authentication information
