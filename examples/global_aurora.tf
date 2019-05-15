@@ -37,7 +37,7 @@ module "vpc_dr" {
 }
 
 module "aurora_primary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=ref=v0.0.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
 
   ##################
   # Required Configuration
@@ -99,13 +99,16 @@ module "aurora_primary" {
   # RDS Monitoring
   ##################
 
-  # notification_topic           = "arn:aws:sns:<region>:<account>:some-topic"
-  # alarm_write_iops_limit       = 100000
-  # alarm_read_iops_limit        = 100000
-  # alarm_cpu_limit              = 60
-  # rackspace_alarms_enabled     = false
-  # monitoring_interval          = 0
-  # existing_monitoring_role_arn = ""
+  # notification_topic              = "arn:aws:sns:<region>:<account>:some-topic"
+  # alarm_write_iops_limit          = 100000
+  # alarm_read_iops_limit           = 100000
+  # alarm_cpu_limit                 = 60
+  # rackspace_alarms_enabled        = false
+  # monitoring_interval             = 0
+  # existing_monitoring_role_arn    = ""
+  # cloudwatch_logs_exports         = []
+  # performance_insights_enable     = false
+  # performance_insights_kms_key_id = ""
 
   ##################
   # Authentication information
@@ -131,7 +134,7 @@ module "aurora_primary" {
 #}
 
 module "aurora_secondary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=ref=v0.0.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
 
   providers = {
     aws = "aws.secondary"
@@ -231,7 +234,7 @@ module "aurora_secondary" {
 
   # environment = "Production"
 
-  # HACK to give me a dependency between modules 
+  # HACK to give me a dependency between modules
   tags = {
     FakeDependency = "${module.aurora_primary.cluster_id}"
   }

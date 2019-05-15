@@ -1,28 +1,34 @@
 /**
  * # aws-terraform-aurora
  *
- *This module creates an aurora RDS cluster.  The module currently supports the aurora, aurora-mysql, and aurora-postgres engines.
+ * This module creates an aurora RDS cluster.  The module currently supports the aurora, aurora-mysql, and aurora-postgres engines.
  *
  * The module will output the required configuration files to enable client and worker node setup and configuration.
  *
- *## Basic Usage
+ * ## Basic Usage
  *
- *```
- *module "aurora_master" {
- *  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.2"
+ * ```HCL
+ * module "aurora_master" {
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
  *
- *  subnets                                  = "${module.vpc.private_subnets}"
- *  security_groups                          = ["${module.vpc.default_sg}"]
- *  name                                     = "sample-aurora-master"
- *  engine                                   = "aurora"
- *  instance_class                           = "db.t2.medium"
- *  storage_encrypted                        = true
- *  binlog_format                            = "MIXED"
- *  password                                 = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
- *  replica_instances                        = 2
- *  instance_availability_zone_list          = ["us-west-2a", "us-west-2b", "us-west-2a"]
- *}
- *```
+ *   binlog_format = "MIXED"
+ *   engine        = "aurora"
+ *
+ *   instance_availability_zone_list = [
+ *     "us-west-2a",
+ *     "us-west-2b",
+ *     "us-west-2c",
+ *   ]
+ *
+ *   instance_class    = "db.t2.medium"
+ *   name              = "sample-aurora-master"
+ *   password          = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
+ *   replica_instances = 2
+ *   security_groups   = ["${module.vpc.default_sg}"]
+ *   storage_encrypted = true
+ *   subnets           = "${module.vpc.private_subnets}"
+ * }
+ * ```
  *
  * Full working references are available at [examples](examples)
  */
@@ -232,7 +238,10 @@ resource "aws_rds_cluster" "db_cluster" {
   preferred_maintenance_window = "${var.maintenance_window}"
   skip_final_snapshot          = "${local.read_replica || var.skip_final_snapshot}"
   final_snapshot_identifier    = "${var.name}-final-snapshot"
-  tags                         = "${merge(var.tags, local.tags)}"
+
+  enabled_cloudwatch_logs_exports = "${var.cloudwatch_logs_exports}"
+
+  tags = "${merge(var.tags, local.tags)}"
 
   # Option Group, Parameter Group, and Subnet Group and cluster parameter group added as the coalesce
   # to use any existing groups seems to throw off dependancies while destroying resources.
@@ -247,7 +256,8 @@ resource "aws_rds_cluster" "db_cluster" {
 # RDS Instances
 
 resource "aws_rds_cluster_instance" "cluster_instance" {
-  count             = "${var.replica_instances + 1}"
+  count = "${var.replica_instances + 1}"
+
   identifier_prefix = "${var.name}-${format("%02d",count.index+1)}-"
 
   engine             = "${var.engine}"
@@ -265,6 +275,9 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
 
   monitoring_interval = "${var.monitoring_interval}"
   monitoring_role_arn = "${local.monitoring_role_arn}"
+
+  performance_insights_enabled    = "${var.performance_insights_enable}"
+  performance_insights_kms_key_id = "${var.performance_insights_kms_key_id}"
 
   tags = "${merge(var.tags, local.tags)}"
 

@@ -20,7 +20,8 @@ output "cluster_endpoint_port" {
 output "cluster_id" {
   description = "The DB Cluster identifier"
   value       = "${aws_rds_cluster.db_cluster.id}"
-  depends_on  = ["aws_rds_cluster_instance.cluster_instance"]
+
+  depends_on = ["aws_rds_cluster_instance.cluster_instance"]
 }
 
 output "db_instance" {

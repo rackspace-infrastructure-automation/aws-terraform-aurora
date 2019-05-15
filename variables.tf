@@ -58,7 +58,7 @@ variable "maintenance_window" {
 
 variable "instance_availability_zone_list" {
   description = <<HEREDOC
-List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance, 
+List of availability zones to place each aurora instance. Availability zone assignment is by index. The first AZ in the list is assigned to the first instance,
 second AZ in the list to the second instance, third AZ in the list to the third instance, etc. Also please remember that the number of AZs specified here should equal to replica_instances + 1.
 HEREDOC
 
@@ -245,6 +245,12 @@ variable "alarm_write_io_limit" {
   default     = 100000
 }
 
+variable "cloudwatch_logs_exports" {
+  description = "List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`."
+  type        = "list"
+  default     = []
+}
+
 variable "existing_monitoring_role" {
   description = "ARN of an existing enhanced monitoring role to use for this instance. (OPTIONAL)"
   type        = "string"
@@ -261,6 +267,18 @@ variable "notification_topic" {
   description = "List of SNS Topic ARNs to use for customer notifications from CloudWatch alarms. (OPTIONAL)"
   type        = "list"
   default     = []
+}
+
+variable "performance_insights_enable" {
+  description = "Specifies whether Performance Insights is enabled or not."
+  type        = "string"
+  default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  description = "(Optional) The ARN for the KMS key to encrypt Performance Insights data. When specifying performance_insights_kms_key_id, performance_insights_enabled needs to be set to true."
+  type        = "string"
+  default     = ""
 }
 
 variable "rackspace_alarms_enabled" {
