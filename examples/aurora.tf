@@ -32,7 +32,7 @@ module "vpc_dr" {
 }
 
 module "aurora_master" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
 
   ##################
   # Required Configuration
@@ -128,7 +128,7 @@ data "aws_kms_alias" "rds_crr" {
 }
 
 module "aurora_replica" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
 
   providers = {
     aws = "aws.oregon"

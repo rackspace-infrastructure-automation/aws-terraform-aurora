@@ -8,7 +8,7 @@ The module will output the required configuration files to enable client and wor
 
 ```HCL
 module "aurora_master" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
 
   binlog_format = "MIXED"
   engine        = "aurora"
