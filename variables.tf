@@ -35,7 +35,7 @@ variable "backup_window" {
 }
 
 variable "backtrack_window" {
-  description = "The target backtrack window, in seconds.  Defaults to 1 day. Setting only affects supported versions (currently MySQL 5.6)."
+  description = "The target backtrack window, in seconds.  Defaults to 1 day. Setting only affects supported versions (currently MySQL 5.6). Disable by setting to '0'."
   type        = "string"
   default     = 86400
 }
