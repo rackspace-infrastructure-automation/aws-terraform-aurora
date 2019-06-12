@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "aurora_master" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.6"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
  *
  *   binlog_format = "MIXED"
  *   engine        = "aurora"
@@ -63,7 +63,10 @@ locals {
   engine_version = "${coalesce(var.engine_version, lookup(local.engine_defaults[var.engine], "version"))}"
 
   global_cluster_identifier = "${var.engine_mode == "global" ? var.global_cluster_identifier : ""}"
-  backtrack_support         = "${var.engine_mode == "aurora" && var.engine_mode == "provisioned" ? true : false}"
+
+  # backtrack is only support in a very limited set of configurations. Below we determine if a compatible set
+  # of parameters where provided
+  backtrack_support = "${var.engine == "aurora" && var.engine_mode == "provisioned" && var.binlog_format == "OFF" ? true : false}"
 
   tags {
     Name            = "${var.name}"
