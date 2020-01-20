@@ -43,7 +43,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  is_postgres = "${var.engine == "aurora-postgres"}" # Allows setting postgres specific options
+  is_postgres = "${var.engine == "aurora-postgresql"}" # Allows setting postgres specific options
 
   # This map allows setting engine defaults.  Should be updated as new engine versions are released
   engine_defaults = {
@@ -102,7 +102,11 @@ locals {
   version_chunk = "${chunklist(split(".", local.engine_version), local.is_postgres ? 1 : 2)}"
 
   major_version = "${join(".", local.version_chunk[0])}"
-  family        = "${coalesce(var.family, join("", list(var.engine, local.major_version)))}"
+
+  # postgres 9 and >9 behave differently w.r.t family so this is an operation specifically  postgres 9
+  is_postgres9   = "${var.engine == "aurora-postgresql" && local.major_version == 9}"
+  family_version = "${local.is_postgres9 ? join(".", concat(local.version_chunk[0],local.version_chunk[1]))  : local.major_version }"
+  family         = "${coalesce(var.family, join("", list(var.engine, local.family_version)))}"
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -141,7 +145,8 @@ resource "aws_db_option_group" "db_option_group" {
   name_prefix              = "${var.name}-"
   option_group_description = "Option group for ${var.name}"
   engine_name              = "${var.engine}"
-  major_engine_version     = "${local.major_version}"
+
+  major_engine_version = "${local.family_version}"
 
   option = "${concat(var.options, local.options)}"
 
