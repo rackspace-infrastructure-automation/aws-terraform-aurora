@@ -64,3 +64,17 @@ module "aurora_master_with_replicas" {
   storage_encrypted   = true
   subnets             = "${module.vpc.private_subnets}"
 }
+
+module "aurora_postgres" {
+  source = "../../module"
+
+  engine              = "aurora-postgresql"
+  engine_version      = "11.4"
+  instance_class      = "db.t3.medium"
+  name                = "${random_string.name_rstring.result}-test-aurora-3"
+  password            = "${random_string.password.result}"
+  security_groups     = ["${module.vpc.default_sg}"]
+  skip_final_snapshot = true
+  storage_encrypted   = true
+  subnets             = "${module.vpc.private_subnets}"
+}
