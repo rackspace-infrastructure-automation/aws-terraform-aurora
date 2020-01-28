@@ -245,7 +245,7 @@ resource "aws_rds_cluster" "db_cluster" {
   db_subnet_group_name            = "${local.subnet_group}"
   db_cluster_parameter_group_name = "${local.cluster_parameter_group}"
 
-  backup_retention_period      = "${var.backup_retention_period}"
+  backup_retention_period      = "${var.backup_retention_period > 1 && var.backup_retention_period  <= 35 ? var.backup_retention_period : 35 }"
   preferred_backup_window      = "${var.backup_window}"
   backtrack_window             = "${local.backtrack_support ? var.backtrack_window: 0 }"
   preferred_maintenance_window = "${var.maintenance_window}"
