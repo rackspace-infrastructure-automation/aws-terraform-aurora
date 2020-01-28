@@ -45,7 +45,7 @@ Using [aws-terraform-cloudwatch_alarm](https://github.com/rackspace-infrastructu
 | alarm\_write\_io\_limit | CloudWatch Write IOPSLimit Threshold | string | `"100000"` | no |
 | auto\_minor\_version\_upgrade | Boolean value that indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window | string | `"true"` | no |
 | backtrack\_window | The target backtrack window, in seconds.  Defaults to 1 day. Setting only affects supported versions (currently MySQL 5.6). Disable by setting to '0'. | string | `"86400"` | no |
-| backup\_retention\_period | The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups. Compass best practice is 30 or more days. | string | `"35"` | no |
+| backup\_retention\_period | The number of days for which automated backups are retained. The permissible range is a value between 1-35. The aurora service defaults to 1 day but this module defaults to 35. Rackspace best practice is 30+ days. | string | `"35"` | no |
 | backup\_window | The daily time range during which automated backups are created if automated backups are enabled. | string | `"05:00-06:00"` | no |
 | binlog\_format | Sets the desired format. Defaults to OFF. Should be set to MIXED if this Aurora cluster will replicate to another RDS Instance or cluster. Ignored for aurora-postgresql engine | string | `"OFF"` | no |
 | cloudwatch\_logs\_exports | List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`. | list | `<list>` | no |

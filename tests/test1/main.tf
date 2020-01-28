@@ -23,7 +23,7 @@ resource "random_string" "name_rstring" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.10"
 
   vpc_name = "${random_string.name_rstring.result}-Aurora-Test1VPC"
 }

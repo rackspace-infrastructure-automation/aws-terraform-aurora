@@ -23,7 +23,7 @@ variable "subnets" {
 #########################
 
 variable "backup_retention_period" {
-  description = "The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups. Compass best practice is 30 or more days."
+  description = "The number of days for which automated backups are retained. The permissible range is a value between 1-35. The aurora service defaults to 1 day but this module defaults to 35. Rackspace best practice is 30+ days."
   type        = "string"
   default     = 35
 }
