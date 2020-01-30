@@ -1,11 +1,15 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
-  version = ">= 2.1.0"
+  version = "~> 2.1"
   region  = "us-east-1"
 }
 
 provider "aws" {
   alias   = "secondary"
-  version = ">= 2.1.0"
+  version = "~> 2.1"
   region  = "us-west-2"
 }
 

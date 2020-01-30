@@ -40,6 +40,10 @@
 
 terraform {
   required_version = ">= 0.12"
+
+  required_providers {
+    aws = ">= 2.1.0"
+  }
 }
 
 data "aws_region" "current" {
@@ -122,8 +126,8 @@ locals {
 resource "aws_db_subnet_group" "db_subnet_group" {
   count = var.existing_subnet_group == "" ? 1 : 0
 
-  name_prefix = "${var.name}-"
   description = "Database subnet group for ${var.name}"
+  name_prefix = "${var.name}-"
   subnet_ids  = var.subnets
 
   tags = merge(var.tags, local.tags)
@@ -136,8 +140,8 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 resource "aws_db_parameter_group" "db_parameter_group" {
   count = var.existing_parameter_group_name == "" ? 1 : 0
 
-  name_prefix = "${var.name}-"
   description = "Database parameter group for ${var.name}"
+  name_prefix = "${var.name}-"
   family      = local.family
 
   dynamic "parameter" {
@@ -159,9 +163,9 @@ resource "aws_db_parameter_group" "db_parameter_group" {
 resource "aws_db_option_group" "db_option_group" {
   count = var.existing_option_group_name == "" ? 1 : 0
 
+  engine_name              = var.engine
   name_prefix              = "${var.name}-"
   option_group_description = "Option group for ${var.name}"
-  engine_name              = var.engine
 
   major_engine_version = local.family_version
 
@@ -246,8 +250,8 @@ resource "aws_iam_role" "enhanced_monitoring_role" {
 resource "aws_iam_role_policy_attachment" "enhanced_monitoring_policy" {
   count = var.existing_monitoring_role == "" && var.monitoring_interval > 0 ? 1 : 0
 
-  role       = aws_iam_role.enhanced_monitoring_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+  role       = aws_iam_role.enhanced_monitoring_role[0].name
 }
 
 locals {
@@ -284,29 +288,29 @@ resource "aws_rds_cluster" "db_cluster" {
   port           = local.port
   engine_mode    = var.engine_mode
 
-  storage_encrypted = var.storage_encrypted
   kms_key_id        = var.kms_key_id
+  storage_encrypted = var.storage_encrypted
 
   database_name   = var.dbname
-  master_username = var.username
   master_password = var.password
+  master_username = var.username
 
   replication_source_identifier = local.read_replica ? local.source_cluster_arn : ""
-  source_region                 = local.read_replica ? var.source_region : ""
   snapshot_identifier           = var.db_snapshot_arn
+  source_region                 = local.read_replica ? var.source_region : ""
 
   deletion_protection = var.enable_delete_protection
 
-  vpc_security_group_ids          = var.security_groups
-  db_subnet_group_name            = local.subnet_group
   db_cluster_parameter_group_name = local.cluster_parameter_group
+  db_subnet_group_name            = local.subnet_group
+  vpc_security_group_ids          = var.security_groups
 
   backup_retention_period      = var.backup_retention_period
-  preferred_backup_window      = var.backup_window
   backtrack_window             = local.backtrack_support ? var.backtrack_window : 0
+  final_snapshot_identifier    = "${var.name}-final-snapshot"
+  preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window
   skip_final_snapshot          = local.read_replica || var.skip_final_snapshot
-  final_snapshot_identifier    = "${var.name}-final-snapshot"
 
   enabled_cloudwatch_logs_exports = var.cloudwatch_logs_exports
 
@@ -329,18 +333,18 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
 
   identifier_prefix = "${var.name}-${format("%02d", count.index + 1)}-"
 
+  cluster_identifier = aws_rds_cluster.db_cluster.id
   engine             = var.engine
   engine_version     = local.engine_version
   instance_class     = var.instance_class
-  cluster_identifier = aws_rds_cluster.db_cluster.id
   promotion_tier     = count.index
 
   auto_minor_version_upgrade = var.auto_minor_version_upgrade
   publicly_accessible        = var.publicly_accessible
 
-  db_subnet_group_name    = local.subnet_group
-  db_parameter_group_name = local.parameter_group
   availability_zone       = element(var.instance_availability_zone_list, count.index)
+  db_parameter_group_name = local.parameter_group
+  db_subnet_group_name    = local.subnet_group
 
   monitoring_interval = var.monitoring_interval
   monitoring_role_arn = local.monitoring_role_arn
@@ -363,20 +367,22 @@ data "null_data_source" "alarm_dimensions" {
 
 resource "aws_route53_record" "cluster_record" {
   count   = var.create_internal_zone_record ? 1 : 0
-  zone_id = var.internal_zone_id
+
   name    = var.cluster_internal_record_name
-  type    = "CNAME"
-  ttl     = "300"
   records = [aws_rds_cluster.db_cluster.endpoint]
+  ttl     = "300"
+  type    = "CNAME"
+  zone_id = var.internal_zone_id
 }
 
 resource "aws_route53_record" "cluster_reader_record" {
   count   = var.create_internal_zone_record ? 1 : 0
-  zone_id = var.internal_zone_id
+
   name    = var.reader_internal_record_name
-  type    = "CNAME"
-  ttl     = "300"
   records = [aws_rds_cluster.db_cluster.reader_endpoint]
+  ttl     = "300"
+  type    = "CNAME"
+  zone_id = var.internal_zone_id
 }
 
 module "high_cpu" {
