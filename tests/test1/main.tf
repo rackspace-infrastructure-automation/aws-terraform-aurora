@@ -1,5 +1,9 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
-  version = "~> 1.2"
+  version = ">= 2.1.0"
   region  = "us-west-2"
 }
 
@@ -23,9 +27,9 @@ resource "random_string" "name_rstring" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=master"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
-  vpc_name = "${random_string.name_rstring.result}-Aurora-Test1VPC"
+  name = "${random_string.name_rstring.result}-Aurora-Test1VPC"
 }
 
 module "aurora_master" {
@@ -34,13 +38,14 @@ module "aurora_master" {
   binlog_format       = "MIXED"
   engine              = "aurora"
   instance_class      = "db.t2.medium"
+  monitoring_interval = 10
   name                = "${random_string.name_rstring.result}-test-aurora-1"
-  password            = "${random_string.password.result}"
+  password            = random_string.password.result
   replica_instances   = 2
-  security_groups     = ["${module.vpc.default_sg}"]
+  security_groups     = [module.vpc.default_sg]
   skip_final_snapshot = true
   storage_encrypted   = true
-  subnets             = "${module.vpc.private_subnets}"
+  subnets             = module.vpc.private_subnets
 }
 
 module "aurora_master_with_replicas" {
@@ -57,12 +62,12 @@ module "aurora_master_with_replicas" {
 
   instance_class      = "db.t2.medium"
   name                = "${random_string.name_rstring.result}-test-aurora-2"
-  password            = "${random_string.password.result}"
+  password            = random_string.password.result
   replica_instances   = 2
-  security_groups     = ["${module.vpc.default_sg}"]
+  security_groups     = [module.vpc.default_sg]
   skip_final_snapshot = true
   storage_encrypted   = true
-  subnets             = "${module.vpc.private_subnets}"
+  subnets             = module.vpc.private_subnets
 }
 
 module "aurora_postgres" {
@@ -72,9 +77,10 @@ module "aurora_postgres" {
   engine_version      = "11.4"
   instance_class      = "db.t3.medium"
   name                = "${random_string.name_rstring.result}-test-aurora-3"
-  password            = "${random_string.password.result}"
-  security_groups     = ["${module.vpc.default_sg}"]
+  password            = random_string.password.result
+  security_groups     = [module.vpc.default_sg]
   skip_final_snapshot = true
   storage_encrypted   = true
-  subnets             = "${module.vpc.private_subnets}"
+  subnets             = module.vpc.private_subnets
 }
+

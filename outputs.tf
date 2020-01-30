@@ -1,16 +1,16 @@
 output "cluster_endpoint_address" {
   description = "The DNS address of the RDS cluster"
-  value       = "${aws_rds_cluster.db_cluster.endpoint}"
+  value       = aws_rds_cluster.db_cluster.endpoint
 }
 
 output "cluster_endpoint_reader" {
   description = " A read-only endpoint for the Aurora cluster"
-  value       = "${aws_rds_cluster.db_cluster.reader_endpoint}"
+  value       = aws_rds_cluster.db_cluster.reader_endpoint
 }
 
 output "cluster_endpoint_port" {
   description = "The port of the RDS cluster"
-  value       = "${aws_rds_cluster.db_cluster.port}"
+  value       = aws_rds_cluster.db_cluster.port
 }
 
 # Since terraform will build across all modules synchronously, read replicas could potentially be created
@@ -19,32 +19,33 @@ output "cluster_endpoint_port" {
 # built successfully.
 output "cluster_id" {
   description = "The DB Cluster identifier"
-  value       = "${aws_rds_cluster.db_cluster.id}"
+  value       = aws_rds_cluster.db_cluster.id
 
-  depends_on = ["aws_rds_cluster_instance.cluster_instance"]
+  depends_on = [aws_rds_cluster_instance.cluster_instance]
 }
 
 output "db_instance" {
   description = "The DB instance identifier"
-  value       = "${aws_rds_cluster_instance.cluster_instance.*.id}"
+  value       = aws_rds_cluster_instance.cluster_instance.*.id
 }
 
 output "monitoring_role" {
   description = "The IAM role used for Enhanced Monitoring"
-  value       = "${local.monitoring_role_arn}"
+  value       = local.monitoring_role_arn
 }
 
 output "option_group" {
   description = "The Option Group used by the DB Instance"
-  value       = "${local.option_group}"
+  value       = local.option_group
 }
 
 output "parameter_group" {
   description = "The Parameter Group used by the DB Instance"
-  value       = "${local.parameter_group}"
+  value       = local.parameter_group
 }
 
 output "subnet_group" {
   description = "The DB Subnet Group used by the DB Instance"
-  value       = "${local.subnet_group}"
+  value       = local.subnet_group
 }
+
