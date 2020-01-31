@@ -3,14 +3,14 @@ output "cluster_endpoint_address" {
   value       = aws_rds_cluster.db_cluster.endpoint
 }
 
-output "cluster_endpoint_reader" {
-  description = " A read-only endpoint for the Aurora cluster"
-  value       = aws_rds_cluster.db_cluster.reader_endpoint
-}
-
 output "cluster_endpoint_port" {
   description = "The port of the RDS cluster"
   value       = aws_rds_cluster.db_cluster.port
+}
+
+output "cluster_endpoint_reader" {
+  description = " A read-only endpoint for the Aurora cluster"
+  value       = aws_rds_cluster.db_cluster.reader_endpoint
 }
 
 # Since terraform will build across all modules synchronously, read replicas could potentially be created
