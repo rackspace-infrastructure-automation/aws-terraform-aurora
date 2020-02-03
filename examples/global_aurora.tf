@@ -25,13 +25,13 @@ resource "aws_rds_global_cluster" "example" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
   vpc_name = "Test1VPC"
 }
 
 module "vpc_dr" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
   providers = {
     aws = "aws.secondary"
@@ -41,7 +41,7 @@ module "vpc_dr" {
 }
 
 module "aurora_primary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.0"
 
   ##################
   # Required Configuration
@@ -138,7 +138,7 @@ module "aurora_primary" {
 #}
 
 module "aurora_secondary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.0"
 
   providers = {
     aws = "aws.secondary"
