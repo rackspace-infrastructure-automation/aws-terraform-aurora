@@ -88,25 +88,25 @@ locals {
   backtrack_support = var.engine == "aurora" && var.engine_mode == "provisioned" && var.binlog_format == "OFF" ? true : false
 
   tags = {
+    Environment     = var.environment
     Name            = var.name
     ServiceProvider = "Rackspace"
-    Environment     = var.environment
   }
 
   binlog_parameter = {
+    apply_method = "pending-reboot"
     name         = "binlog_format"
     value        = var.binlog_format
-    apply_method = "pending-reboot"
   }
 
   cluster_parameters = {
-    aurora-postgresql = []
     aurora            = [local.binlog_parameter]
     aurora-mysql      = [local.binlog_parameter]
+    aurora-postgresql = []
   }
 
-  parameters = []
   options    = []
+  parameters = []
 
   read_replica       = var.source_cluster != "" && var.source_region != ""
   source_cluster_arn = "arn:aws:rds:${var.source_region}:${data.aws_caller_identity.current.account_id}:cluster:${var.source_cluster}"
@@ -119,8 +119,8 @@ locals {
 
   # postgres 9 and >9 behave differently w.r.t family so this is an operation specifically  postgres 9
   is_postgres9   = var.engine == "aurora-postgresql" && local.major_version == 9
-  family_version = local.is_postgres9 ? join(".", concat(local.version_chunk[0], local.version_chunk[1])) : local.major_version
   family         = coalesce(var.family, join("", [var.engine, local.family_version]))
+  family_version = local.is_postgres9 ? join(".", concat(local.version_chunk[0], local.version_chunk[1])) : local.major_version
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -141,8 +141,8 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   count = var.existing_parameter_group_name == "" ? 1 : 0
 
   description = "Database parameter group for ${var.name}"
-  name_prefix = "${var.name}-"
   family      = local.family
+  name_prefix = "${var.name}-"
 
   dynamic "parameter" {
     for_each = concat(var.parameters, local.parameters)
@@ -225,12 +225,12 @@ resource "aws_rds_cluster_parameter_group" "db_cluster_parameter_group" {
 
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
-    effect  = "Allow"
     actions = ["sts:AssumeRole"]
+    effect  = "Allow"
 
     principals {
-      type        = "Service"
       identifiers = ["monitoring.rds.amazonaws.com"]
+      type        = "Service"
     }
   }
 }
@@ -255,14 +255,6 @@ resource "aws_iam_role_policy_attachment" "enhanced_monitoring_policy" {
 }
 
 locals {
-  subnet_group = coalesce(
-    var.existing_subnet_group,
-    join("", aws_db_subnet_group.db_subnet_group.*.id),
-  )
-  parameter_group = coalesce(
-    var.existing_parameter_group_name,
-    join("", aws_db_parameter_group.db_parameter_group.*.id),
-  )
   cluster_parameter_group = coalesce(
     var.existing_cluster_parameter_group_name,
     join(
@@ -274,6 +266,15 @@ locals {
     var.existing_option_group_name,
     join("", aws_db_option_group.db_option_group.*.id),
   )
+  parameter_group = coalesce(
+    var.existing_parameter_group_name,
+    join("", aws_db_parameter_group.db_parameter_group.*.id),
+  )
+  subnet_group = coalesce(
+    var.existing_subnet_group,
+    join("", aws_db_subnet_group.db_subnet_group.*.id),
+  )
+
   monitoring_role_arn = var.existing_monitoring_role == "" ? join("", aws_iam_role.enhanced_monitoring_role.*.arn) : var.existing_monitoring_role
 }
 
@@ -284,9 +285,9 @@ resource "aws_rds_cluster" "db_cluster" {
   global_cluster_identifier = local.global_cluster_identifier
 
   engine         = var.engine
+  engine_mode    = var.engine_mode
   engine_version = local.engine_version
   port           = local.port
-  engine_mode    = var.engine_mode
 
   kms_key_id        = var.kms_key_id
   storage_encrypted = var.storage_encrypted
@@ -305,8 +306,8 @@ resource "aws_rds_cluster" "db_cluster" {
   db_subnet_group_name            = local.subnet_group
   vpc_security_group_ids          = var.security_groups
 
-  backup_retention_period      = var.backup_retention_period
   backtrack_window             = local.backtrack_support ? var.backtrack_window : 0
+  backup_retention_period      = var.backup_retention_period
   final_snapshot_identifier    = "${var.name}-final-snapshot"
   preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window
@@ -366,7 +367,7 @@ data "null_data_source" "alarm_dimensions" {
 }
 
 resource "aws_route53_record" "cluster_record" {
-  count   = var.create_internal_zone_record ? 1 : 0
+  count = var.create_internal_zone_record ? 1 : 0
 
   name    = var.cluster_internal_record_name
   records = [aws_rds_cluster.db_cluster.endpoint]
@@ -376,7 +377,7 @@ resource "aws_route53_record" "cluster_record" {
 }
 
 resource "aws_route53_record" "cluster_reader_record" {
-  count   = var.create_internal_zone_record ? 1 : 0
+  count = var.create_internal_zone_record ? 1 : 0
 
   name    = var.reader_internal_record_name
   records = [aws_rds_cluster.db_cluster.reader_endpoint]
