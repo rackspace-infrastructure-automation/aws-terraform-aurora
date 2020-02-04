@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "aurora_master" {
- *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.0.7"
+ *   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
  *
  *   binlog_format = "MIXED"
  *   engine        = "aurora"
@@ -33,7 +33,7 @@
  * Full working references are available at [examples](examples)
  * ## Other TF Modules Used
  * Using [aws-terraform-cloudwatch_alarm](https://github.com/rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm) to create the following CloudWatch Alarms:
- *	 - high_cpu
+ *   - high_cpu
  *   - write_io_high
  *   - read_io_high
  */
@@ -307,7 +307,7 @@ resource "aws_rds_cluster" "db_cluster" {
   vpc_security_group_ids          = var.security_groups
 
   backtrack_window             = local.backtrack_support ? var.backtrack_window : 0
-  backup_retention_period      = var.backup_retention_period
+  backup_retention_period      = var.backup_retention_period >= 1 && var.backup_retention_period <= 35 ? var.backup_retention_period : 35
   final_snapshot_identifier    = "${var.name}-final-snapshot"
   preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window

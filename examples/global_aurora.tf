@@ -41,7 +41,7 @@ module "vpc_dr" {
 }
 
 module "aurora_primary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
 
   ##################
   # Required Configuration
@@ -138,7 +138,7 @@ module "aurora_primary" {
 #}
 
 module "aurora_secondary" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
 
   providers = {
     aws = "aws.secondary"
