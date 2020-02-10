@@ -3,14 +3,14 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 2.1"
   region  = "us-east-1"
+  version = "~> 2.1"
 }
 
 provider "aws" {
   alias   = "secondary"
-  version = "~> 2.1"
   region  = "us-west-2"
+  version = "~> 2.1"
 }
 
 data "aws_kms_secrets" "rds_credentials" {
@@ -27,17 +27,17 @@ resource "aws_rds_global_cluster" "example" {
 module "vpc" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
-  vpc_name = "Test1VPC"
+  name = "Test1VPC"
 }
 
 module "vpc_dr" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
-  providers = {
-    aws = "aws.secondary"
-  }
+  name = "Test2VPC"
 
-  vpc_name = "Test2VPC"
+  providers = {
+    aws = aws.secondary
+  }
 }
 
 module "aurora_primary" {
@@ -47,17 +47,16 @@ module "aurora_primary" {
   # Required Configuration
   ##################
 
-  subnets                   = "${module.vpc.private_subnets}"
-  security_groups           = ["${module.vpc.default_sg}"]
-  name                      = "aurora-primary"
-  engine                    = "aurora"
-  instance_class            = "db.r3.large"
-  storage_encrypted         = false
   binlog_format             = "MIXED"
-  password                  = "${data.aws_kms_secrets.rds_credentials.plaintext["password"]}"
-  global_cluster_identifier = "${aws_rds_global_cluster.example.id}"
+  engine                    = "aurora"
   engine_mode               = "global"
-
+  global_cluster_identifier = aws_rds_global_cluster.example.id
+  instance_class            = "db.r3.large"
+  name                      = "aurora-primary"
+  password                  = data.aws_kms_secrets.rds_credentials.plaintext["password"]
+  security_groups           = [module.vpc.default_sg]
+  storage_encrypted         = false
+  subnets                   = module.vpc.private_subnets
   ##################
   # VPC Configuration
   ##################
@@ -68,10 +67,10 @@ module "aurora_primary" {
   # Backups and Maintenance
   ##################
 
-  # maintenance_window      = "Sun:07:00-Sun:08:00"
   # backup_retention_period = 35
   # backup_window           = "05:00-06:00"
   # db_snapshot_arn          = "some-cluster-snapshot-arn"
+  # maintenance_window      = "Sun:07:00-Sun:08:00"
 
   ##################
   # Basic RDS
@@ -85,34 +84,34 @@ module "aurora_primary" {
   # RDS Advanced
   ##################
 
-  # publicly_accessible                   = false
-  # binlog_format                         = "OFF"
   # auto_minor_version_upgrade            = true
-  # family                                = "aurora5.6"
-  # replica_instances                     = 1
-  # storage_encrypted                     = false
-  # kms_key_id                            = "some-kms-key-id"
-  # parameters                            = []
-  # existing_parameter_group_name         = "some-parameter-group-name"
+  # binlog_format                         = "OFF"
   # cluster_parameters                    = []
   # existing_cluster_parameter_group_name = "some-parameter-group-name"
-  # options                               = []
   # existing_option_group_name            = "some-option-group-name"
+  # existing_parameter_group_name         = "some-parameter-group-name"
+  # family                                = "aurora5.6"
+  # kms_key_id                            = "some-kms-key-id"
+  # options                               = []
+  # parameters                            = []
+  # publicly_accessible                   = false
+  # replica_instances                     = 1
+  # storage_encrypted                     = false
 
   ##################
   # RDS Monitoring
   ##################
 
-  # notification_topic              = "arn:aws:sns:<region>:<account>:some-topic"
-  # alarm_write_iops_limit          = 100000
-  # alarm_read_iops_limit           = 100000
   # alarm_cpu_limit                 = 60
-  # rackspace_alarms_enabled        = false
-  # monitoring_interval             = 0
-  # existing_monitoring_role_arn    = ""
+  # alarm_read_iops_limit           = 100000
+  # alarm_write_iops_limit          = 100000
   # cloudwatch_logs_exports         = []
+  # existing_monitoring_role_arn    = ""
+  # monitoring_interval             = 0
+  # notification_topic              = "arn:aws:sns:<region>:<account>:some-topic"
   # performance_insights_enable     = false
   # performance_insights_kms_key_id = ""
+  # rackspace_alarms_enabled        = false
 
   ##################
   # Authentication information
@@ -133,113 +132,100 @@ module "aurora_primary" {
 
 #undo
 #data "aws_kms_alias" "rds_crr" {
-#  provider = "aws.oregon"
 #  name     = "alias/aws/rds"
+#  provider = "aws.oregon"
 #}
 
 module "aurora_secondary" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
 
-  providers = {
-    aws = "aws.secondary"
-  }
-
-  ##################
-  # Required Configuration
-  ##################
-
-  subnets                   = "${module.vpc_dr.private_subnets}"
-  security_groups           = ["${module.vpc_dr.default_sg}"]
-  name                      = "aurora-secondary"
-  engine                    = "aurora"
-  instance_class            = "db.r3.large"
-  storage_encrypted         = false
   binlog_format             = "MIXED"
-  password                  = ""
-  username                  = ""
-  global_cluster_identifier = "${aws_rds_global_cluster.example.id}"
+  engine                    = "aurora"
   engine_mode               = "global"
-
-  ##################
-  # VPC Configuration
-  ##################
-
-
-  # existing_subnet_group = "some-subnet-group-name"
-
-
-  ##################
-  # Backups and Maintenance
-  ##################
-
-
-  # maintenance_window      = "Sun:07:00-Sun:08:00"
-  # backup_retention_period = 35
-  # backup_window           = "05:00-06:00"
-  # db_snapshot_arn          = "some-cluster-snapshot-arn"
-
-
-  ##################
-  # Basic RDS
-  ##################
-
-
-  # dbname         = "mydb"
-  # engine_version = "5.6.10a"
-  # port           = "3306"
-
-
-  ##################
-  # RDS Advanced
-  ##################
-
-
-  # publicly_accessible                   = false
-  # binlog_format                         = "OFF"
-  # auto_minor_version_upgrade            = true
-  # family                                = "aurora5.6"
-  # replica_instances                     = 1
-  # storage_encrypted                     = false
-  # kms_key_id                            = "some-kms-key-id"
-  # parameters                            = []
-  # existing_parameter_group_name         = "some-parameter-group-name"
-  # cluster_parameters                    = []
-  # existing_cluster_parameter_group_name = "some-parameter-group-name"
-  # options                               = []
-  # existing_option_group_name            = "some-option-group-name"
-
-
-  ##################
-  # RDS Monitoring
-  ##################
-
-
-  # notification_topic           = "arn:aws:sns:<region>:<account>:some-topic"
-  # alarm_write_iops_limit       = 100000
-  # alarm_read_iops_limit        = 100000
-  # alarm_cpu_limit              = 60
-  # rackspace_alarms_enabled     = false
-  # monitoring_interval          = 0
-  # existing_monitoring_role_arn = ""
-
-
-  ##################
-  # Authentication information
-  ##################
-
-
-  # username = "dbadmin"
-
-
-  ##################
-  # Other parameters
-  ##################
-
-
-  # environment = "Production"
+  global_cluster_identifier = aws_rds_global_cluster.example.id
+  instance_class            = "db.r3.large"
+  name                      = "aurora-secondary"
+  password                  = ""
+  security_groups           = [module.vpc_dr.default_sg]
+  storage_encrypted         = false
+  subnets                   = module.vpc_dr.private_subnets
+  username                  = ""
 
   # HACK to give me a dependency between modules
   tags = {
-    FakeDependency = "${module.aurora_primary.cluster_id}"
+    FakeDependency = module.aurora_primary.cluster_id
+  }
+
+  providers = {
+    aws = aws.secondary
+    ##################
+    # Required Configuration
+    ##################
+
+    ##################
+    # VPC Configuration
+    ##################
+
+    # existing_subnet_group = "some-subnet-group-name"
+
+    ##################
+    # Backups and Maintenance
+    ##################
+
+    # backup_retention_period = 35
+    # backup_window           = "05:00-06:00"
+    # db_snapshot_arn          = "some-cluster-snapshot-arn"
+    # maintenance_window      = "Sun:07:00-Sun:08:00"
+
+    ##################
+    # Basic RDS
+    ##################
+
+    # dbname         = "mydb"
+    # engine_version = "5.6.10a"
+    # port           = "3306"
+
+    ##################
+    # RDS Advanced
+    ##################
+
+    # auto_minor_version_upgrade            = true
+    # binlog_format                         = "OFF"
+    # cluster_parameters                    = []
+    # existing_cluster_parameter_group_name = "some-parameter-group-name"
+    # existing_option_group_name            = "some-option-group-name"
+    # existing_parameter_group_name         = "some-parameter-group-name"
+    # family                                = "aurora5.6"
+    # kms_key_id                            = "some-kms-key-id"
+    # options                               = []
+    # parameters                            = []
+    # publicly_accessible                   = false
+    # replica_instances                     = 1
+    # storage_encrypted                     = false
+
+    ##################
+    # RDS Monitoring
+    ##################
+
+    # alarm_cpu_limit              = 60
+    # alarm_read_iops_limit        = 100000
+    # alarm_write_iops_limit       = 100000
+    # existing_monitoring_role_arn = ""
+    # monitoring_interval          = 0
+    # notification_topic           = "arn:aws:sns:<region>:<account>:some-topic"
+    # rackspace_alarms_enabled     = false
+
+    ##################
+    # Authentication information
+    ##################
+
+    # username = "dbadmin"
+
+    ##################
+    # Other parameters
+    ##################
+
+    # environment = "Production"
   }
 }
+
