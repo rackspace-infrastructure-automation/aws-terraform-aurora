@@ -4,13 +4,13 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  version = "~> 2.1"
+  version = "~> 2.7"
 }
 
 provider "aws" {
   alias   = "secondary"
   region  = "us-west-2"
-  version = "~> 2.1"
+  version = "~> 2.7"
 }
 
 data "aws_kms_secrets" "rds_credentials" {
