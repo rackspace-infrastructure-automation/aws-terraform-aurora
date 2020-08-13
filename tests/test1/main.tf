@@ -84,3 +84,17 @@ module "aurora_postgres" {
   subnets             = module.vpc.private_subnets
 }
 
+# Postgres 9 has some special cases with versioning, so this version is explicitly tested
+module "aurora_postgres9" {
+  source = "../../module"
+
+  engine              = "aurora-postgresql"
+  engine_version      = "9.6.17"
+  instance_class      = "db.r4.large"
+  name                = "${random_string.name_rstring.result}-test-aurora-4"
+  password            = random_string.password.result
+  security_groups     = [module.vpc.default_sg]
+  skip_final_snapshot = true
+  storage_encrypted   = true
+  subnets             = module.vpc.private_subnets
+}

@@ -19,6 +19,8 @@ data "aws_kms_secrets" "rds_credentials" {
   }
 }
 
+data "aws_region" "current_region" {}
+
 module "vpc" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
@@ -36,7 +38,7 @@ module "vpc_dr" {
 }
 
 module "aurora_mysql_master" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.3"
 
   ##################
   # Required Configuration
@@ -132,7 +134,7 @@ data "aws_kms_alias" "rds_crr" {
 }
 
 module "aurora_mysql_replica" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.3"
 
   providers = {
     aws = aws.oregon
@@ -218,7 +220,7 @@ module "aurora_mysql_replica" {
   password          = data.aws_kms_secrets.rds_credentials.plaintext["password"]
   security_groups   = [module.vpc_dr.default_sg]
   source_cluster    = module.aurora_mysql_master.cluster_id
-  source_region     = data.aws_region.current.name
+  source_region     = data.aws_region.current_region.name
   storage_encrypted = true
   subnets           = module.vpc_dr.private_subnets
 }

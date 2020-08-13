@@ -65,7 +65,7 @@ locals {
     }
     aurora-postgresql = {
       port    = "5432"
-      version = "9.6.8"
+      version = "9.6.17"
     }
   }
 
@@ -118,7 +118,7 @@ locals {
   major_version = join(".", local.version_chunk[0])
 
   # postgres 9 and >9 behave differently w.r.t family so this is an operation specifically  postgres 9
-  is_postgres9   = var.engine == "aurora-postgresql" && local.major_version == 9
+  is_postgres9   = var.engine == "aurora-postgresql" && local.major_version == "9"
   family         = coalesce(var.family, join("", [var.engine, local.family_version]))
   family_version = local.is_postgres9 ? join(".", concat(local.version_chunk[0], local.version_chunk[1])) : local.major_version
 }

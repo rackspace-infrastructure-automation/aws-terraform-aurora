@@ -26,7 +26,7 @@ module "vpc" {
 }
 
 module "aurora_postgresql_master" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-aurora//?ref=v0.12.3"
 
   ##################
   # Required Configuration
