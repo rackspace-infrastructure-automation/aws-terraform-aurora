@@ -68,7 +68,6 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | environment | Application environment for which this network is being created. one of: ('Development', 'Integration', 'PreProduction', 'Production', 'QA', 'Staging', 'Test') | `string` | `"Development"` | no |
 | existing\_cluster\_parameter\_group\_name | The existing cluster parameter group to use for this instance. (OPTIONAL) | `string` | `""` | no |
 | existing\_monitoring\_role | ARN of an existing enhanced monitoring role to use for this instance. (OPTIONAL) | `string` | `""` | no |
-| existing\_option\_group\_name | The existing option group to use for this instance. (OPTIONAL) | `string` | `""` | no |
 | existing\_parameter\_group\_name | The existing parameter group to use for this instance. (OPTIONAL) | `string` | `""` | no |
 | existing\_subnet\_group | The existing DB subnet group to use for this cluster (OPTIONAL) | `string` | `""` | no |
 | family | Parameter Group Family Name (ex. aurora5.6, aurora-postgresql9.6, aurora-mysql5.7) | `string` | `""` | no |
@@ -111,7 +110,6 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | cluster\_id | The DB Cluster identifier |
 | db\_instance | The DB instance identifier |
 | monitoring\_role | The IAM role used for Enhanced Monitoring |
-| option\_group | The Option Group used by the DB Instance |
 | parameter\_group | The Parameter Group used by the DB Instance |
 | subnet\_group | The DB Subnet Group used by the DB Instance |
 
