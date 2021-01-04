@@ -160,41 +160,6 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   }
 }
 
-resource "aws_db_option_group" "db_option_group" {
-  count = var.existing_option_group_name == "" ? 1 : 0
-
-  engine_name              = var.engine
-  name_prefix              = "${var.name}-"
-  option_group_description = "Option group for ${var.name}"
-
-  major_engine_version = local.family_version
-
-  dynamic "option" {
-    for_each = concat(var.options, local.options)
-    content {
-      db_security_group_memberships  = lookup(option.value, "db_security_group_memberships", null)
-      option_name                    = option.value.option_name
-      port                           = lookup(option.value, "port", null)
-      version                        = lookup(option.value, "version", null)
-      vpc_security_group_memberships = lookup(option.value, "vpc_security_group_memberships", null)
-
-      dynamic "option_settings" {
-        for_each = lookup(option.value, "option_settings", [])
-        content {
-          name  = option_settings.value.name
-          value = option_settings.value.value
-        }
-      }
-    }
-  }
-
-  tags = merge(var.tags, local.tags)
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_rds_cluster_parameter_group" "db_cluster_parameter_group" {
   count = var.existing_cluster_parameter_group_name == "" ? 1 : 0
 
@@ -262,10 +227,6 @@ locals {
       aws_rds_cluster_parameter_group.db_cluster_parameter_group.*.id,
     ),
   )
-  option_group = coalesce(
-    var.existing_option_group_name,
-    join("", aws_db_option_group.db_option_group.*.id),
-  )
   parameter_group = coalesce(
     var.existing_parameter_group_name,
     join("", aws_db_parameter_group.db_parameter_group.*.id),
@@ -321,7 +282,6 @@ resource "aws_rds_cluster" "db_cluster" {
   # to use any existing groups seems to throw off dependancies while destroying resources.
   depends_on = [
     aws_db_parameter_group.db_parameter_group,
-    aws_db_option_group.db_option_group,
     aws_db_subnet_group.db_subnet_group,
     aws_rds_cluster_parameter_group.db_cluster_parameter_group,
   ]

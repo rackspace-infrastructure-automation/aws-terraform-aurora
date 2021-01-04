@@ -124,12 +124,6 @@ variable "existing_monitoring_role" {
   default     = ""
 }
 
-variable "existing_option_group_name" {
-  description = "The existing option group to use for this instance. (OPTIONAL)"
-  type        = string
-  default     = ""
-}
-
 variable "existing_parameter_group_name" {
   description = "The existing parameter group to use for this instance. (OPTIONAL)"
   type        = string
