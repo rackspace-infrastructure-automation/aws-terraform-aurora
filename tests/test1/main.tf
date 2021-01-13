@@ -30,6 +30,7 @@ module "vpc" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork//?ref=v0.12.0"
 
   name = "${random_string.name_rstring.result}-Aurora-Test1VPC"
+  tags = var.tags
 }
 
 module "aurora_master" {
@@ -46,6 +47,7 @@ module "aurora_master" {
   skip_final_snapshot = true
   storage_encrypted   = true
   subnets             = module.vpc.private_subnets
+  tags                = var.tags
 }
 
 module "aurora_master_with_replicas" {
@@ -68,6 +70,7 @@ module "aurora_master_with_replicas" {
   skip_final_snapshot = true
   storage_encrypted   = true
   subnets             = module.vpc.private_subnets
+  tags                = var.tags
 }
 
 module "aurora_postgres" {
@@ -82,6 +85,7 @@ module "aurora_postgres" {
   skip_final_snapshot = true
   storage_encrypted   = true
   subnets             = module.vpc.private_subnets
+  tags                = var.tags
 }
 
 # Postgres 9 has some special cases with versioning, so this version is explicitly tested
@@ -97,4 +101,5 @@ module "aurora_postgres9" {
   skip_final_snapshot = true
   storage_encrypted   = true
   subnets             = module.vpc.private_subnets
+  tags                = var.tags
 }
