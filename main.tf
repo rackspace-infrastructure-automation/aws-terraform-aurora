@@ -163,11 +163,7 @@ resource "aws_db_parameter_group" "db_parameter_group" {
 resource "aws_rds_cluster_parameter_group" "db_cluster_parameter_group" {
   count = var.existing_cluster_parameter_group_name == "" ? 1 : 0
 
-  # This resource does not utilize name_prefix.  This is due to a bug preventing unique names from being generated.
-  # Currently using name directly.  If that proves to be troublesome, we can attempt to generate a
-  # suffix using timestamps.  See https://github.com/terraform-providers/terraform-provider-aws/issues/1739
-  # for further details
-  name = var.name
+  name_prefix = "${var.name}-"
 
   description = "Cluster parameter group for ${var.name}"
   family      = local.family
