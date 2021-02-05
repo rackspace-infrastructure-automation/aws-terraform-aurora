@@ -270,7 +270,7 @@ resource "aws_rds_cluster" "db_cluster" {
   preferred_maintenance_window = var.maintenance_window
   skip_final_snapshot          = local.read_replica || var.skip_final_snapshot
 
-  enabled_cloudwatch_logs_exports = var.cloudwatch_logs_exports
+  enabled_cloudwatch_logs_exports = var.cloudwatch_exports_logs_list
 
   tags = merge(var.tags, local.tags)
 
@@ -366,7 +366,7 @@ module "high_cpu" {
 module "write_io_high" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
 
-  alarm_description        = "Write IO > ${var.alarm_write_io_limit}, sending notification..."
+  alarm_description        = "Write IO > ${var.alarm_write_iops_limit}, sending notification..."
   alarm_name               = "${var.name}-write-io-high"
   comparison_operator      = "GreaterThanThreshold"
   customer_alarms_enabled  = true
@@ -377,7 +377,7 @@ module "write_io_high" {
   period                   = 300
   rackspace_alarms_enabled = false
   statistic                = "Average"
-  threshold                = var.alarm_write_io_limit
+  threshold                = var.alarm_write_iops_limit
 
   dimensions = [
     {
@@ -390,7 +390,7 @@ module "write_io_high" {
 module "read_io_high" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
 
-  alarm_description        = "Read IO > ${var.alarm_read_io_limit}, sending notification..."
+  alarm_description        = "Read IO > ${var.alarm_read_iops_limit}, sending notification..."
   alarm_name               = "${var.name}-read-io-high"
   comparison_operator      = "GreaterThanThreshold"
   customer_alarms_enabled  = true
@@ -401,7 +401,7 @@ module "read_io_high" {
   period                   = 300
   rackspace_alarms_enabled = false
   statistic                = "Average"
-  threshold                = var.alarm_read_io_limit
+  threshold                = var.alarm_read_iops_limit
 
   dimensions = [
     {
