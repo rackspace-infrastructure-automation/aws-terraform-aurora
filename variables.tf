@@ -4,13 +4,13 @@ variable "alarm_cpu_limit" {
   default     = 60
 }
 
-variable "alarm_read_io_limit" {
+variable "alarm_read_iops_limit" {
   description = "CloudWatch Read IOPSLimit Threshold"
   type        = number
   default     = 60
 }
 
-variable "alarm_write_io_limit" {
+variable "alarm_write_iops_limit" {
   description = "CloudWatch Write IOPSLimit Threshold"
   type        = number
   default     = 100000
@@ -46,7 +46,7 @@ variable "binlog_format" {
   default     = "OFF"
 }
 
-variable "cloudwatch_logs_exports" {
+variable "cloudwatch_exports_logs_list" {
   description = "List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`."
   type        = list(string)
   default     = []

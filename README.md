@@ -48,14 +48,14 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
 | alarm\_cpu\_limit | CloudWatch CPUUtilization Threshold | `number` | `60` | no |
-| alarm\_read\_io\_limit | CloudWatch Read IOPSLimit Threshold | `number` | `60` | no |
-| alarm\_write\_io\_limit | CloudWatch Write IOPSLimit Threshold | `number` | `100000` | no |
+| alarm\_read\_iops\_limit | CloudWatch Read IOPSLimit Threshold | `number` | `60` | no |
+| alarm\_write\_iops\_limit | CloudWatch Write IOPSLimit Threshold | `number` | `100000` | no |
 | auto\_minor\_version\_upgrade | Boolean value that indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window | `bool` | `true` | no |
 | backtrack\_window | The target backtrack window, in seconds.  Defaults to 1 day. Setting only affects supported versions (currently MySQL 5.6). Disable by setting to '0'. | `number` | `86400` | no |
 | backup\_retention\_period | The number of days for which automated backups are retained. The permissible range is a value between 1-35. The aurora service defaults to 1 day but this module defaults to 35. Rackspace best practice is 30+ days. | `number` | `35` | no |
 | backup\_window | The daily time range during which automated backups are created if automated backups are enabled. | `string` | `"05:00-06:00"` | no |
 | binlog\_format | Sets the desired format. Defaults to OFF. Should be set to MIXED if this Aurora cluster will replicate to another RDS Instance or cluster. Ignored for aurora-postgresql engine | `string` | `"OFF"` | no |
-| cloudwatch\_logs\_exports | List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`. | `list(string)` | `[]` | no |
+| cloudwatch\_exports\_logs\_list | List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`. | `list(string)` | `[]` | no |
 | cluster\_internal\_record\_name | The full record name you would like to add as a CNAME for the cluster that matches your Hosted Zone. i.e. cluster.example.com | `string` | `""` | no |
 | cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | `list(string)` | `[]` | no |
 | create\_internal\_zone\_record | Create an internal Route 53 record for the RDS cluster and cluster reader. Default is false. | `bool` | `false` | no |
