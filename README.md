@@ -36,6 +36,13 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
   - write\_io\_high
   - read\_io\_high
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.7.0 |
+
 ## Providers
 
 | Name | Version |
@@ -43,10 +50,35 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | aws | >= 2.7.0 |
 | null | n/a |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| high_cpu | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+| read_io_high | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+| write_io_high | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/caller_identity) |
+| [aws_db_parameter_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/db_parameter_group) |
+| [aws_db_subnet_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/db_subnet_group) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/iam_policy_document) |
+| [aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/iam_role) |
+| [aws_iam_role_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/iam_role_policy_attachment) |
+| [aws_rds_cluster](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/rds_cluster) |
+| [aws_rds_cluster_instance](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/rds_cluster_instance) |
+| [aws_rds_cluster_parameter_group](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/rds_cluster_parameter_group) |
+| [aws_region](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/data-sources/region) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.7.0/docs/resources/route53_record) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | alarm\_cpu\_limit | CloudWatch CPUUtilization Threshold | `number` | `60` | no |
 | alarm\_read\_iops\_limit | CloudWatch Read IOPSLimit Threshold | `number` | `60` | no |
 | alarm\_write\_iops\_limit | CloudWatch Write IOPSLimit Threshold | `number` | `100000` | no |
@@ -112,4 +144,3 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | monitoring\_role | The IAM role used for Enhanced Monitoring |
 | parameter\_group | The Parameter Group used by the DB Instance |
 | subnet\_group | The DB Subnet Group used by the DB Instance |
-
