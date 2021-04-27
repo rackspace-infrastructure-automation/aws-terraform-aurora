@@ -343,7 +343,7 @@ resource "aws_route53_record" "cluster_reader_record" {
 }
 
 module "high_cpu" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_count              = var.replica_instances + 1
   alarm_description        = "CPU Utilization above ${var.alarm_cpu_limit} for 15 minutes.  Sending notifications..."
@@ -364,7 +364,7 @@ module "high_cpu" {
 }
 
 module "write_io_high" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_description        = "Write IO > ${var.alarm_write_iops_limit}, sending notification..."
   alarm_name               = "${var.name}-write-io-high"
@@ -388,7 +388,7 @@ module "write_io_high" {
 }
 
 module "read_io_high" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.4"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6"
 
   alarm_description        = "Read IO > ${var.alarm_read_iops_limit}, sending notification..."
   alarm_name               = "${var.name}-read-io-high"
