@@ -82,6 +82,7 @@ module "aurora_postgres" {
   name                = "${random_string.name_rstring.result}-test-aurora-3"
   password            = random_string.password.result
   security_groups     = [module.vpc.default_sg]
+  parameters          = [{ apply_method = "pending-reboot", name = "debug_pretty_print", value = "1"}]
   skip_final_snapshot = true
   storage_encrypted   = true
   subnets             = module.vpc.private_subnets
