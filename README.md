@@ -89,7 +89,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | binlog\_format | Sets the desired format. Defaults to OFF. Should be set to MIXED if this Aurora cluster will replicate to another RDS Instance or cluster. Ignored for aurora-postgresql engine | `string` | `"OFF"` | no |
 | cloudwatch\_exports\_logs\_list | List of log types to export to cloudwatch. If omitted, no logs will be exported. The following log types are supported: `audit`, `error`, `general`, `slowquery`. | `list(string)` | `[]` | no |
 | cluster\_internal\_record\_name | The full record name you would like to add as a CNAME for the cluster that matches your Hosted Zone. i.e. cluster.example.com | `string` | `""` | no |
-| cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | `list(string)` | `[]` | no |
+| cluster\_parameters | List of custom cluster parameters to apply to the parameter group. | `list(map(string))` | `[]` | no |
 | create\_internal\_zone\_record | Create an internal Route 53 record for the RDS cluster and cluster reader. Default is false. | `bool` | `false` | no |
 | db\_snapshot\_arn | The identifier for the DB cluster snapshot from which you want to restore. | `string` | `""` | no |
 | dbname | The DB name to create. If omitted, no database is created initially | `string` | `""` | no |
@@ -113,7 +113,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | name | The name prefix to use for the resources created in this module. | `string` | n/a | yes |
 | notification\_topic | List of SNS Topic ARNs to use for customer notifications from CloudWatch alarms. (OPTIONAL) | `list(string)` | `[]` | no |
 | options | List of custom options to apply to the option group. | `list(string)` | `[]` | no |
-| parameters | List of custom parameters to apply to the parameter group. | `list(string)` | `[]` | no |
+| parameters | List of custom parameters to apply to the parameter group. | `list(map(string))` | `[]` | no |
 | password | Password for the local administrator account. | `string` | n/a | yes |
 | performance\_insights\_enable | Specifies whether Performance Insights is enabled or not. | `bool` | `false` | no |
 | performance\_insights\_kms\_key\_id | (Optional) The ARN for the KMS key to encrypt Performance Insights data. When specifying performance\_insights\_kms\_key\_id, performance\_insights\_enabled needs to be set to true. | `string` | `""` | no |
